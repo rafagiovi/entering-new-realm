@@ -1,0 +1,56 @@
+import math
+# y = ln(x)
+
+def ln(): # Mencari galat dari ln(x) dengan Deret Taylor dan Deret Maclaurin
+    x = float(input("Masukan input x :"))
+    n = int(input("Masukan Pemotongan suku ke-n:"))
+    a = math.log(x) # Nilai ln(x) yang sebenarnya
+    a_hat = 0
+    # Deret Taylor
+    for i in range(n):
+        p = i+1
+        s = ((-(x-1))**p)/-p
+        a_hat += s
+    # Deret Maclaurin
+    y = x-1
+    a2_hat = 0
+    for o in range(n):
+        pp = o+1
+        sd = ((-y)**pp)/(-pp)
+        a2_hat += sd
+
+    print("DERET TAYLOR")
+    # G_Absolut merupakan galat absolut
+    G_Absolut = abs(a - a_hat)
+    # G_Relatif merupakan galat relatif
+    G_Relatif = G_Absolut/a
+    # G_Persentase merupakan galat persentase
+    G_Persentase = G_Relatif * 100
+    
+    print("Nilai Eksak           :", a)
+    print("Nilai Perkiraan       :", round(a_hat,n+1))
+    print()
+    print("ANALISIS GALAT")
+    print("Galat Absolut         :", G_Absolut)
+    print("Galat Relatif         :", G_Relatif)
+    print(f"Galat Persentase      : {G_Persentase}%")
+    print()
+
+    print("DERET MACLAURIN")
+        # G_Absolut merupakan galat absolut
+    G_Absolut2 = abs(a - a2_hat)
+    # G_Relatif merupakan galat relatif
+    G_Relatif2 = G_Absolut2/a
+    # G_Persentase merupakan galat persentase
+    G_Persentase2 = G_Relatif2 * 100
+    
+    print("Nilai Eksak           :", a)
+    print("Nilai Perkiraan       :", round(a2_hat,n+1))
+    print()
+    print("ANALISIS GALAT")
+    print("Galat Absolut         :", G_Absolut2)
+    print("Galat Relatif         :", G_Relatif2)
+    print(f"Galat Persentase      : {G_Persentase2}%")
+    print()
+
+ln()
