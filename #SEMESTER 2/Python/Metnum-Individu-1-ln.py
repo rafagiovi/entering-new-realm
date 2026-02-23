@@ -42,7 +42,7 @@ def ln(): # Fungsi untuk mencari galat dari ln(x) dengan Deret Taylor dan Maclau
     
     # --- ANALISIS GALAT TAYLOR ---
     G_Absolut = abs(a - a_hat) # G_Absolut: Menghitung selisih positif antara nilai eksak (a) dan perkiraan (a_hat)
-    G_Relatif = G_Absolut/a # G_Relatif: Menghitung rasio galat absolut terhadap nilai eksak
+    G_Relatif = G_Absolut/abs(a) # G_Relatif: Menghitung rasio galat absolut terhadap nilai eksak
     G_Persentase = G_Relatif * 100 # G_Persentase: Mengubah galat relatif menjadi bentuk persen
     
     print("Nilai Eksak           :", a) # Menampilkan nilai bawaan math.log
@@ -60,7 +60,7 @@ def ln(): # Fungsi untuk mencari galat dari ln(x) dengan Deret Taylor dan Maclau
     
     # --- ANALISIS GALAT MACLAURIN ---
     G_Absolut2 = abs(a - a2_hat) # G_Absolut2: Menghitung selisih positif nilai eksak (a) dan perkiraan Maclaurin (a2_hat)
-    G_Relatif2 = G_Absolut2/a # G_Relatif2: Menghitung rasio galat absolut terhadap nilai eksak
+    G_Relatif2 = G_Absolut2/abs(a) # G_Relatif2: Menghitung rasio galat absolut terhadap nilai eksak
     G_Persentase2 = G_Relatif2 * 100 # G_Persentase2: Mengubah galat relatif menjadi bentuk persen
     
     print("Nilai Eksak           :", a)
