@@ -1,4 +1,4 @@
-import math # Mengimpor modul matematika bawaan Python
+import numpy as np # Mengimpor modul matematika bawaan Python
 # y = ln(x)
 
 def ln(): # Fungsi untuk mencari galat dari ln(x) dengan Deret Taylor dan Maclaurin
@@ -6,7 +6,7 @@ def ln(): # Fungsi untuk mencari galat dari ln(x) dengan Deret Taylor dan Maclau
     # --- INPUT VARIABEL ---
     x = 0.2 # float(input("Masukan input x :"))             # Meminta input nilai x yang akan dicari logaritmanya (batas konvergensi 0 < x <= 2)
     n = 5 # int(input("Masukan Pemotongan suku ke-n:"))     # Meminta jumlah iterasi pemotongan (truncation) suku ke-n
-    a = math.log(x)                                         # a: Menyimpan nilai eksak (sebenarnya) dari ln(x) menggunakan fungsi bawaan Python
+    a = np.log(x)                                           # a: Menyimpan nilai eksak (sebenarnya) dari ln(x)
     
     print("\n==================================================")
     print("URAIAN OPERASI DERET TAYLOR")
