@@ -1,5 +1,5 @@
 import math
-# y = ln(x)
+# y = 1/(1-x)
 
 def ln(): # Mencari galat dari ln(x) dengan Deret Taylor dan Deret Maclaurin
     x = float(input("Masukan input x :"))
@@ -37,7 +37,7 @@ def ln(): # Mencari galat dari ln(x) dengan Deret Taylor dan Deret Maclaurin
     print()
 
     print("DERET MACLAURIN")
-        # G_Absolut merupakan galat absolut
+    # G_Absolut merupakan galat absolut
     G_Absolut2 = abs(a - a2_hat)
     # G_Relatif merupakan galat relatif
     G_Relatif2 = G_Absolut2/a
@@ -53,4 +53,3 @@ def ln(): # Mencari galat dari ln(x) dengan Deret Taylor dan Deret Maclaurin
     print(f"Galat Persentase      : {G_Persentase2}%")
     print()
 
-ln()
