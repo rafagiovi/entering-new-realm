@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.optimize import fsolve
 
 # Definisi fungsi objektif yang akan dicari nilai akarnya (titik potong terhadap sumbu x)
 # Persamaan: f(x) = 3x - e^x
@@ -35,7 +36,7 @@ def visualisasi(history, akar_akhir, fg):
     # --- Grafik 2: Visualisasi Konvergensi ---
     ax2.plot(range(len(history)), history, marker='o', linestyle='-', color='green')
     ax2.axhline(akar_akhir, color='red', linestyle='--', alpha=0.5, label='Nilai Konvergen')
-    ax2.set_title('Grafik Konvergensi (Metode Biseksi)')
+    ax2.set_title('Grafik Konvergensi (Metode Secant)')
     ax2.set_xlabel('Iterasi ke-')
     ax2.set_ylabel('Estimasi Akar (c)')
     ax2.grid(True, linestyle=':', alpha=0.6)
@@ -52,21 +53,17 @@ def visualisasi(history, akar_akhir, fg):
 # Modifikasi dari Newton Raphson, di mana turunan pertama didekati menggunakan garis potong (secant line) dari dua titik sebelumnya.
 def input_secant():
     print("======METODE SECANT======")
-    print("Pilih Fungsi yang akan diujikan:")
-    print("1. f(x) = 3x - e^x")
-    print("2. f(x) = e^x - x^2 + 3*x - 2")
-    fg = int(input(">>> "))
-    # Meminta pengguna memasukkan dua batas interval
     print("Tebakan akar antara 0 ≤ x ≤ 1 (Berdasarkan tugas)")
-    xs1 = float(input("Masukan tebakan akar 1: "))
-    xs2 = float(input("Masukan tebakan akar 2: "))
+    a = float(input("Masukan tebakan akar 1: "))
+    b = float(input("Masukan tebakan akar 2: "))
+    print()
+    print("========= f(x) = 3x - e^x ========")
     print("=========== LOG ITERASI ==========")
-    if fg == 1:
-        fg = f
-    else:
-        fg = g
-    
-    secant(xs1, xs2, fg)
+    secant(a, b, f)
+    print()
+    print("=== f(x) = e^x - x^2 + 3*x - 2 ===")
+    print("=========== LOG ITERASI ==========")
+    secant(a, b, g)
 
 def secant(a, b, fg, n = 0, history=None):
     if history is None:
@@ -84,10 +81,20 @@ def secant(a, b, fg, n = 0, history=None):
 
     # Kriteria berhenti
     if abs(fg(c)) < e:
-        print(f"Iterasi ke-{n}: {c}") # Mengembalikan hasil akhir
+        akar_asli = fsolve(fg, a)[0]
+        # 1. Menghitung Galat Sebenarnya
+        galat = abs(akar_asli - c)
+        
+        # 2. Menghitung Galat Persentase
+        galat_persentase = (galat / abs(akar_asli)) * 100
+        
+        print(f"Iterasi ke-{n}: {c}")
         print(f"========== HASIL AKHIR ==========")
-        print(f"Akar-akar: {c}\nIterasi: {n}")
-        # Panggil fungsi visualisasi sebelum program mengeluarkan output akhir
+        print(f"Akar-akar          : {c}")
+        print(f"Akar Asli          : {akar_asli}")
+        print(f"Galat Sebenarnya   : {galat:.10f}")
+        print(f"Galat Persentase   : {galat_persentase:.10f}%")
+        print(f"Iterasi            : {n}")
 
         return visualisasi(history, c, fg)
     else:

@@ -1,11 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.optimize import fsolve
 
 # Definisi fungsi objektif yang akan dicari nilai akarnya (titik potong terhadap sumbu x)
 # Persamaan: f(x) = 3x - e^x
 def f(x):
     return 3*x - np.exp(x)
-# Persamaan: f(x) = e^x - x^2 + 3*x - 2
+# Persamaan: g(x) = e^x - x^2 + 3*x - 2
 def g(x):
     return np.exp(x) - x**2 + 3*x - 2
 
@@ -52,21 +53,18 @@ def visualisasi(history, akar_akhir, fg):
 # Mencari akar dengan cara membagi dua interval tebakan awal secara berulang.
 def input_biseksi():
     print("========= METODE BISEKSI =========")
-    print("Pilih Fungsi yang akan diujikan:")
-    print("1. f(x) = 3x - e^x")
-    print("2. f(x) = e^x - x^2 + 3*x - 2")
-    fg = int(input(">>> "))
     # Meminta pengguna memasukkan dua batas interval
     print("Tebakan akar antara 0 ≤ x ≤ 1 (Berdasarkan tugas)")
-    xb1 = float(input("Masukan tebakan akar 1: "))
-    xb2 = float(input("Masukan tebakan akar 2: "))
+    a = float(input("Masukan tebakan akar 1: "))
+    b = float(input("Masukan tebakan akar 2: "))
+    print()
+    print("========= f(x) = 3x - e^x ========")
     print("=========== LOG ITERASI ==========")
-    if fg == 1:
-        fg = f
-    else:
-        fg = g
-    
-    biseksi(xb1, xb2, fg)
+    biseksi(a, b, f)
+    print()
+    print("=== f(x) = e^x - x^2 + 3*x - 2 ===")
+    print("=========== LOG ITERASI ==========")
+    biseksi(a, b, g)
 
 def biseksi(a, b, fg, n = 0, history=None):
     if history is None:
@@ -80,10 +78,20 @@ def biseksi(a, b, fg, n = 0, history=None):
     
     # Jika nilai fungsi pada c sudah lebih kecil dari toleransi (sudah sangat dekat dengan 0)
     if abs(fc) < e:
-        print(f"Iterasi ke-{n}: {c}") # Mengembalikan hasil akhir
+        akar_asli = fsolve(fg, a)[0]
+        # 1. Menghitung Galat Sebenarnya
+        galat = abs(akar_asli - c)
+        
+        # 2. Menghitung Galat Persentase
+        galat_persentase = (galat / abs(akar_asli)) * 100
+        
+        print(f"Iterasi ke-{n}: {c}")
         print(f"========== HASIL AKHIR ==========")
-        print(f"Akar-akar: {c}\nIterasi: {n}")
-        # Panggil fungsi visualisasi sebelum program mengeluarkan output akhir
+        print(f"Akar-akar          : {c}")
+        print(f"Akar Asli          : {akar_asli}")
+        print(f"Galat Sebenarnya   : {galat:.10f}")
+        print(f"Galat Persentase   : {galat_persentase:.10f}%")
+        print(f"Iterasi            : {n}")
 
         return visualisasi(history, c, fg)
     else:
