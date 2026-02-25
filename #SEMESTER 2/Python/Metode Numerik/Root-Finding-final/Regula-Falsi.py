@@ -48,58 +48,58 @@ def visualisasi(history, akar_akhir, fg):
 # KODE 
 # =====================================================================
 
-# 1. Metode Biseksi
-# Mencari akar dengan cara membagi dua interval tebakan awal secara berulang.
-def input_biseksi():
-    print("========= METODE BISEKSI =========")
+# 2. Metode Regula Falsi
+# Mirip biseksi, namun titik potong baru dihitung menggunakan interpolasi linear (garis lurus) antara f(a) dan f(b).
+
+def input_regulafalsi():
+    print("======METODE REGULA FALSI======")
     print("Pilih Fungsi yang akan diujikan:")
     print("1. f(x) = 3x - e^x")
     print("2. f(x) = e^x - x^2 + 3*x - 2")
     fg = int(input(">>> "))
     # Meminta pengguna memasukkan dua batas interval
     print("Tebakan akar antara 0 ≤ x ≤ 1 (Berdasarkan tugas)")
-    xb1 = float(input("Masukan tebakan akar 1: "))
-    xb2 = float(input("Masukan tebakan akar 2: "))
+    xrf1 = float(input("Masukan tebakan akar 1: "))
+    xrf2 = float(input("Masukan tebakan akar 2: "))
     print("=========== LOG ITERASI ==========")
     if fg == 1:
         fg = f
     else:
         fg = g
-    
-    biseksi(xb1, xb2, fg)
 
-def biseksi(a, b, fg, n = 0, history=None):
+    regula_falsi(xrf1, xrf2, fg)
+
+def regula_falsi(a, b, fg, n = 0, history = None):
     if history is None:
         history = [] # Inisialisasi list history pada iterasi awal
 
-    e = 1e-6 # Toleransi error untuk kriteria berhenti (mendekati nol)
-    c = (a+b)/2 # Menghitung titik tengah (nilai akar perkiraan)
-    fc = fg(c)
+    n_max = 100 # Batas maksimal iterasi untuk mencegah rekursi tak terbatas (infinite loop)
+    if n > n_max:
+        return f"Gagal konvergen setelah {n_max} iterasi."
+    
+    e = 1e-6 # Toleransi error
+    # Menghitung titik c menggunakan rumus Regula Falsi
+    c = b - ((fg(b) *(b -a))/(fg(b) - fg(a)))
 
     history.append(c)
     
-    # Jika nilai fungsi pada c sudah lebih kecil dari toleransi (sudah sangat dekat dengan 0)
-    if abs(fc) < e:
-        print(f"Iterasi ke-{n}: {c}") # Mengembalikan hasil akhir
-        print(f"========== HASIL AKHIR ==========")
+    # Kriteria berhenti
+    if abs(fg(c)) < e:
         print(f"Akar-akar: {c}\nIterasi: {n}")
-        # Panggil fungsi visualisasi sebelum program mengeluarkan output akhir
-
         return visualisasi(history, c, fg)
     else:
-        # Jika tanda f(a) dan f(b) sama, berarti interval tidak mengurung akar
+        # Pengecekan apakah akar terkurung
         if fg(a) * fg(b) > 0: 
             print("input tidak valid")
-            return input_biseksi() # Meminta input ulang
-        
-        # Mengecek di sub-interval mana akar berada
-        if fg(a) * fc < 0:
-            # Akar berada di antara a dan c
+            return input_regulafalsi()
+            
+        # Mempersempit interval
+        if fg(a) * fg(c) < 0:
             print(f"Iterasi ke-{n}: {c}")
-            return biseksi(a,c, fg, n + 1, history)
+            return regula_falsi(a,c,fg, n + 1, history)
         else:
-            # Akar berada di antara c dan b
             print(f"Iterasi ke-{n}: {c}")
-            return biseksi(c,b, fg, n + 1, history)
+            return regula_falsi(c,b,fg, n + 1, history)
+        
 
-input_biseksi()
+input_regulafalsi()

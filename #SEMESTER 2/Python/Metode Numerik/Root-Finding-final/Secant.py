@@ -48,38 +48,42 @@ def visualisasi(history, akar_akhir, fg):
 # KODE 
 # =====================================================================
 
-# 1. Metode Biseksi
-# Mencari akar dengan cara membagi dua interval tebakan awal secara berulang.
-def input_biseksi():
-    print("========= METODE BISEKSI =========")
+# 2. Secant
+# Modifikasi dari Newton Raphson, di mana turunan pertama didekati menggunakan garis potong (secant line) dari dua titik sebelumnya.
+def input_secant():
+    print("======METODE SECANT======")
     print("Pilih Fungsi yang akan diujikan:")
     print("1. f(x) = 3x - e^x")
     print("2. f(x) = e^x - x^2 + 3*x - 2")
     fg = int(input(">>> "))
     # Meminta pengguna memasukkan dua batas interval
     print("Tebakan akar antara 0 ≤ x ≤ 1 (Berdasarkan tugas)")
-    xb1 = float(input("Masukan tebakan akar 1: "))
-    xb2 = float(input("Masukan tebakan akar 2: "))
+    xs1 = float(input("Masukan tebakan akar 1: "))
+    xs2 = float(input("Masukan tebakan akar 2: "))
     print("=========== LOG ITERASI ==========")
     if fg == 1:
         fg = f
     else:
         fg = g
     
-    biseksi(xb1, xb2, fg)
+    secant(xs1, xs2, fg)
 
-def biseksi(a, b, fg, n = 0, history=None):
+def secant(a, b, fg, n = 0, history=None):
     if history is None:
         history = [] # Inisialisasi list history pada iterasi awal
 
-    e = 1e-6 # Toleransi error untuk kriteria berhenti (mendekati nol)
-    c = (a+b)/2 # Menghitung titik tengah (nilai akar perkiraan)
-    fc = fg(c)
-
-    history.append(c)
+    n_max = 100 # Batas maksimal iterasi untuk mencegah rekursi tak terbatas (infinite loop)
+    if n > n_max:
+        return f"Gagal konvergen setelah {n_max} iterasi."
     
-    # Jika nilai fungsi pada c sudah lebih kecil dari toleransi (sudah sangat dekat dengan 0)
-    if abs(fc) < e:
+    e = 1e-6 # Toleransi error
+    # Menghitung x baru menggunakan rumus Secant
+    c = b - ((fg(b) *(b -a))/(fg(b) - fg(a)))
+    
+    history.append(c)
+
+    # Kriteria berhenti
+    if abs(fg(c)) < e:
         print(f"Iterasi ke-{n}: {c}") # Mengembalikan hasil akhir
         print(f"========== HASIL AKHIR ==========")
         print(f"Akar-akar: {c}\nIterasi: {n}")
@@ -87,19 +91,8 @@ def biseksi(a, b, fg, n = 0, history=None):
 
         return visualisasi(history, c, fg)
     else:
-        # Jika tanda f(a) dan f(b) sama, berarti interval tidak mengurung akar
-        if fg(a) * fg(b) > 0: 
-            print("input tidak valid")
-            return input_biseksi() # Meminta input ulang
-        
-        # Mengecek di sub-interval mana akar berada
-        if fg(a) * fc < 0:
-            # Akar berada di antara a dan c
-            print(f"Iterasi ke-{n}: {c}")
-            return biseksi(a,c, fg, n + 1, history)
-        else:
-            # Akar berada di antara c dan b
-            print(f"Iterasi ke-{n}: {c}")
-            return biseksi(c,b, fg, n + 1, history)
-
-input_biseksi()
+        # Melanjutkan iterasi dengan dua titik terakhir: b dan c
+        print(f"Iterasi ke-{n}: {c}")
+        return secant(b, c, fg, n + 1, history)
+    
+input_secant()
