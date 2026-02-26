@@ -1,122 +1,152 @@
-import matplotlib.pyplot as plt
 import numpy as np
-from scipy.optimize import fsolve
+import matplotlib.pyplot as plt
+import pandas as pd
+import time
 
-# Definisi fungsi objektif yang akan dicari nilai akarnya (titik potong terhadap sumbu x)
-# Persamaan: f(x) = 3x - e^x
+# =========================================================
+# DEFINISI FUNGSI DAN TURUNAN
+# =========================================================
 def f(x):
-    return 3*x - np.exp(x)
-# Persamaan: g(x) = e^x - x^2 + 3*x - 2
-def g(x):
     return np.exp(x) - x**2 + 3*x - 2
 
+def df(x):
+    return np.exp(x) - 2*x + 3
 
-# Visualisasi grafik fungsi dan grafik konvergen
+# =========================================================
+# VISUALISASI FUNGSI
+# =========================================================
+x_plot = np.linspace(0,1,400)
+plt.figure()
+plt.plot(x_plot, f(x_plot))
+plt.axhline(0)
+plt.title("Grafik f(x) = e^x - x^2 + 3x - 2")
+plt.xlabel("x")
+plt.ylabel("f(x)")
+plt.grid()
+plt.show()
 
-def visualisasi(history, akar_akhir, fg):
-    # Membuat figure dengan 2 subplot (grafik fungsi dan grafik konvergensi)
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+# =========================================================
+# METODE NEWTON-RAPHSON
+# =========================================================
+def newton_raphson(x0, tol=1e-6, max_iter=100):
+    start = time.time()
 
-    # --- Grafik 1: Visualisasi Fungsi f(x) ---
-    # Menentukan rentang x untuk grafik (di sekitar akar yang ditemukan)
-    x_range = np.linspace(akar_akhir - 2, akar_akhir + 2, 400)
-    y_range = fg(x_range)
+    data = []
+    eval_f = 0
+    eval_df = 0
+    x = x0
 
-    ax1.plot(x_range, y_range, label='Fungsi yang Diuji', color='blue')
-    ax1.axhline(0, color='black', linestyle='--', linewidth=1)
-    ax1.axvline(0, color='black', linestyle='--', linewidth=1)
-    ax1.scatter(akar_akhir, fg(akar_akhir), color='red', zorder=5, label=f'Akar: {akar_akhir:.4f}')
-    ax1.set_ylim(-2, 1)
-    ax1.set_title('Grafik Fungsi')
-    ax1.set_xlabel('x')
-    ax1.set_ylabel('y')
-    ax1.grid(True, linestyle=':', alpha=0.6)
-    ax1.legend()
+    for i in range(max_iter):
+        fx = f(x)
+        dfx = df(x)
+        eval_f += 1
+        eval_df += 1
 
-    # --- Grafik 2: Visualisasi Konvergensi ---
-    ax2.plot(range(len(history)), history, marker='o', linestyle='-', color='green')
-    ax2.axhline(akar_akhir, color='red', linestyle='--', alpha=0.5, label='Nilai Konvergen')
-    ax2.set_title('Grafik Konvergensi (Metode Biseksi)')
-    ax2.set_xlabel('Iterasi ke-')
-    ax2.set_ylabel('Estimasi Akar (c)')
-    ax2.grid(True, linestyle=':', alpha=0.6)
-    ax2.legend()
+        if dfx == 0:
+            print("Turunan nol! Metode gagal.")
+            break
 
-    plt.tight_layout()
-    plt.show()
+        error = abs(fx)
+        data.append([i+1, x, fx, dfx, error])
 
-# =====================================================================
-# KODE
-# =====================================================================
+        if error < tol:
+            break
 
-# 1. Metode Biseksi
-# Mencari akar dengan cara membagi dua interval tebakan awal secara berulang.
-def input_biseksi():
-    print("========= METODE BISEKSI =========")
-    # Meminta pengguna memasukkan dua batas interval
-    print("Tebakan akar antara 0 ≤ x ≤ 1 (Berdasarkan tugas)")
-    a = float(input("Masukan tebakan akar 1: "))
-    b = float(input("Masukan tebakan akar 2: "))
-    print()
-    print("========= f(x) = 3x - e^x ========")
-    print("=========== LOG ITERASI ==========")
-    print(f"{'Iterasi':<8} | {'a':<10} | {'b':<10} | {'c':<10} | {'f(a)':<10} | {'f(b)':<10} | {'f(c)':<10}")
-    print("-" * 86)
-    biseksi(a, b, f)
-    print()
-    print("=== f(x) = e^x - x^2 + 3*x - 2 ===")
-    print("=========== LOG ITERASI ==========")
-    print(f"{'Iterasi':<8} | {'a':<10} | {'b':<10} | {'c':<10} | {'f(a)':<10} | {'f(b)':<10} | {'f(c)':<10}")
-    print("-" * 86)
-    biseksi(a, b, g)
+        x = x - fx/dfx
 
-# Menambahkan parameter eval_count dengan nilai default 0
-def biseksi(a, b, fg, n = 0, history=None, eval_count=0):
-    if history is None:
-        history = [] # Inisialisasi list history pada iterasi awal
+    end = time.time()
+    runtime = end - start
 
-    e = 1e-6 # Toleransi error untuk kriteria berhenti (mendekati nol)
-    c = (a+b)/2 # Menghitung titik tengah (nilai akar perkiraan)
-    fc = fg(c)
-    eval_count += 1 # Menghitung 1 evaluasi fungsi untuk fg(c)
+    df_result = pd.DataFrame(data, columns=[
+        "Iterasi", "x", "f(x)", "f'(x)", "Error"
+    ])
 
-    history.append(c)
+    print("\n========== HASIL NEWTON-RAPHSON ==========")
+    print(df_result)
+    print("\nRingkasan:")
+    print("Akar              =", x)
+    print("Jumlah Iterasi    =", len(df_result))
+    print("Evaluasi f(x)     =", eval_f)
+    print("Evaluasi f'(x)    =", eval_df)
+    print("Waktu Komputasi   =", runtime, "detik")
 
-    # Jika nilai fungsi pada c sudah lebih kecil dari toleransi (sudah sangat dekat dengan 0)
-    if abs(fc) < e:
-        akar_asli = fsolve(fg, a)[0]
-        # 1. Menghitung Galat Sebenarnya
-        galat = abs(akar_asli - c)
+    return df_result, eval_f, eval_df, runtime
 
-        # 2. Menghitung Galat Persentase
-        galat_persentase = (galat / abs(akar_asli)) * 100
 
-        print(f"{n:<8} | {a:<10.6f} | {b:<10.6f} | {c:<10.6f} | {fg(a):<10.6f} | {fg(b):<10.6f} | {fc:<10.6f}")
-        print(f"========== HASIL AKHIR ==========")
-        print(f"Akar-akar          : {c}")
-        print(f"Akar Asli          : {akar_asli}")
-        print(f"Galat Absolut      : {galat:.10f}")
-        print(f"Galat Persentase   : {galat_persentase:.10f}%")
-        print(f"Iterasi            : {n}")
-        print(f"Evaluasi Fungsi    : {eval_count}") # Menampilkan total evaluasi fungsi
+# =========================================================
+# METODE SECANT
+# =========================================================
+def secant(x0, x1, tol=1e-6, max_iter=100):
+    start = time.time()
 
-        return visualisasi(history, c, fg)
-    else:
-        eval_count += 2 # Menghitung 2 evaluasi fungsi untuk fg(a) dan fg(b) pada baris di bawah
-        # Jika tanda f(a) dan f(b) sama, berarti interval tidak mengurung akar
-        if fg(a) * fg(b) > 0:
-            print("input tidak valid")
-            return input_biseksi() # Meminta input ulang
+    data = []
+    eval_f = 0
 
-        eval_count += 1 # Menghitung 1 evaluasi fungsi untuk fg(a) pada baris di bawah
-        # Mengecek di sub-interval mana akar berada
-        if fg(a) * fc < 0:
-            # Akar berada di antara a dan c
-            print(f"{n:<8} | {a:<10.6f} | {b:<10.6f} | {c:<10.6f} | {fg(a):<10.6f} | {fg(b):<10.6f} | {fc:<10.6f}")
-            return biseksi(a,c, fg, n + 1, history, eval_count)
-        else:
-            # Akar berada di antara c dan b
-            print(f"{n:<8} | {a:<10.6f} | {b:<10.6f} | {c:<10.6f} | {fg(a):<10.6f} | {fg(b):<10.6f} | {fc:<10.6f}")
-            return biseksi(c,b, fg, n + 1, history, eval_count)
+    for i in range(max_iter):
+        f0 = f(x0)
+        f1 = f(x1)
+        eval_f += 2
 
-input_biseksi()
+        if (f1 - f0) == 0:
+            print("Pembagi nol! Metode gagal.")
+            break
+
+        error = abs(f1)
+        data.append([i+1, x1, f1, error])
+
+        if error < tol:
+            break
+
+        x2 = x1 - f1*(x1-x0)/(f1-f0)
+        x0 = x1
+        x1 = x2
+
+    end = time.time()
+    runtime = end - start
+
+    df_result = pd.DataFrame(data, columns=[
+        "Iterasi", "x", "f(x)", "Error"
+    ])
+
+    print("\n========== HASIL SECANT ==========")
+    print(df_result)
+    print("\nRingkasan:")
+    print("Akar              =", x1)
+    print("Jumlah Iterasi    =", len(df_result))
+    print("Evaluasi f(x)     =", eval_f)
+    print("Waktu Komputasi   =", runtime, "detik")
+
+    return df_result, eval_f, runtime
+
+
+# =========================================================
+# JALANKAN METODE
+# =========================================================
+df_newton, eval_f_newton, eval_df_newton, time_newton = newton_raphson(0.5)
+df_secant, eval_f_secant, time_secant = secant(0, 1)
+
+
+# =========================================================
+# GRAFIK PERBANDINGAN KONVERGENSI
+# =========================================================
+plt.figure()
+plt.plot(df_newton["Iterasi"], df_newton["Error"], marker='o', label="Newton-Raphson")
+plt.plot(df_secant["Iterasi"], df_secant["Error"], marker='s', label="Secant")
+plt.yscale("log")
+plt.title("Perbandingan Kurva Konvergensi")
+plt.xlabel("Iterasi")
+plt.ylabel("Error (log scale)")
+plt.legend()
+plt.grid()
+plt.show()
+
+
+# =========================================================
+# PERBANDINGAN KINERJA METODE
+# =========================================================
+print("\n================ PERBANDINGAN METODE ================")
+print("Metode            | Iterasi | Eval f(x) | Eval f'(x) | Waktu (detik)")
+print("---------------------------------------------------------------------")
+print(f"Newton-Raphson    | {len(df_newton):^7d} | {eval_f_newton:^9d} | {eval_df_newton:^10d} | {time_newton:.6f}")
+print(f"Secant            | {len(df_secant):^7d} | {eval_f_secant:^9d} | {'-':^10} | {time_secant:.6f}")
+print("=====================================================================")
